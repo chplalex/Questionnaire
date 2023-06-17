@@ -19,6 +19,14 @@ class AppStyles {
     letterSpacing: 0,
   );
 
+  static const title16Red = TextStyle(
+    fontFamily: 'Poppins',
+    color: Colors.red,
+    fontSize: 16.0,
+    fontWeight: FontWeight.w600,
+    letterSpacing: 0,
+  );
+
   static const text14Black = TextStyle(
     fontFamily: 'Poppins',
     color: Colors.black,

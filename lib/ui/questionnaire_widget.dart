@@ -164,7 +164,7 @@ class _QuestionnaireState extends State<QuestionnaireWidget> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(AppConstants.languageCardTitle, style: AppStyles.title16),
+            _cardTitle(text: AppConstants.languageCardTitle, isRequired: true),
             _languageTypeRadio(
               context,
               title: AppConstants.languageCardKotlin,
@@ -187,6 +187,13 @@ class _QuestionnaireState extends State<QuestionnaireWidget> {
         ),
       );
 
+  Widget _cardTitle({required String text, required bool isRequired}) => Row(
+    children: [
+      Text(text, style: AppStyles.title16),
+      if (isRequired) Text(AppConstants.cardTitleAsterisk, style: AppStyles.title16Red),
+    ],
+  );
+
   Widget _languageTypeRadio(
     BuildContext context, {
     required String title,
@@ -208,7 +215,7 @@ class _QuestionnaireState extends State<QuestionnaireWidget> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(AppConstants.likeQuestionCardTitle, style: AppStyles.title16),
+            _cardTitle(text: AppConstants.likeQuestionCardTitle, isRequired: false),
             const SizedBox(height: _normalPadding),
             QuestionnaireTextField(
               controller: _likeQuestionController,
@@ -225,7 +232,7 @@ class _QuestionnaireState extends State<QuestionnaireWidget> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(AppConstants.homeAssignmentCardTitle, style: AppStyles.title16),
+            _cardTitle(text: AppConstants.homeAssignmentCardTitle, isRequired: true),
             _difficultTypeRadio(
               context,
               title: AppConstants.homeAssignmentCardEasy,

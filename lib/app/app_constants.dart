@@ -22,15 +22,17 @@ class AppConstants {
 
   static const submitButtonText = "Submit";
 
-  static const maxRequestAttempts = 3;
-  static const delayFactor = 1000;
-  static const durationMilliseconds = 10000;
-  static const appKey = 'uec3yFm56gYLdpCAQfUbaPVnwlv8qtJB';
+  static const apiMaxRequestAttempts = 3;
+  static const apiRetryDelayFactorDuration = Duration(milliseconds: 1000);
 
-  static const questionnaireAuthority = "localhost:3000";
-  static const updateQuestionnaireEndPoint = "questionnaire";
+  static const questionnaireAuthority = "10.0.2.2:3000";
+  static const updateQuestionnaireEndPoint = "posts";
 
   static const toastDurationInSeconds = 2;
 
   static const buttonIsDisabledToast = "Please, fill all required fields";
+
+  static const connectionTimeoutDuration = Duration(seconds: 2);
+
+  static String cardTitleAsterisk = " *";
 }
