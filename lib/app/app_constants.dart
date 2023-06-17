@@ -25,8 +25,8 @@ class AppConstants {
   static const apiMaxRequestAttempts = 3;
   static const apiRetryDelayFactorDuration = Duration(milliseconds: 1000);
 
-  // for testing on the Android Emulator only
-  static const questionnaireAuthority = "10.0.2.2:3000";
+  // for testing on the iOS Simulator only
+  static const questionnaireAuthority = "localhost:3000";
   static const updateQuestionnaireEndPoint = "posts";
 
   static const toastDurationInSeconds = 2;
