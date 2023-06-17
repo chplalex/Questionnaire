@@ -15,22 +15,26 @@ class QuestionnaireCubit extends Cubit<QuestionnaireState> {
   QuestionnaireCubit(this._mapper, this._repository) : super(QuestionnaireState.initial());
 
   void languageChanged(LanguageType? languageType) {
-    final newState = state.copyWith(
-      languageType: languageType,
-      likeQuestionAnswer: likeQuestionAnswer,
-      homeAssignmentOther: homeAssignmentOther,
-    ).check;
+    final newState = state
+        .copyWith(
+          languageType: languageType,
+          likeQuestionAnswer: likeQuestionAnswer,
+          homeAssignmentOther: homeAssignmentOther,
+        )
+        .check;
 
     emit(newState);
   }
 
   void difficultyChanged(DifficultType? difficultType) {
-    final newState = state.copyWith(
-      homeAssignmentDifficultType: difficultType,
-      likeQuestionAnswer: likeQuestionAnswer,
-      homeAssignmentOther: homeAssignmentOther,
-      homeAssignmentOtherIsEnable: difficultType == DifficultType.other,
-    ).check;
+    final newState = state
+        .copyWith(
+          homeAssignmentDifficultType: difficultType,
+          likeQuestionAnswer: likeQuestionAnswer,
+          homeAssignmentOther: homeAssignmentOther,
+          homeAssignmentOtherIsEnable: difficultType == DifficultType.other,
+        )
+        .check;
 
     emit(newState);
   }
@@ -45,18 +49,19 @@ class QuestionnaireCubit extends Cubit<QuestionnaireState> {
 
     final submitState = state.copyWith(
       likeQuestionAnswer: likeQuestionAnswer,
-      homeAssignmentOther: homeAssignmentOther,
+      homeAssignmentOther: state.homeAssignmentDifficultType == DifficultType.other ? homeAssignmentOther : "",
     );
     final submitModel = _mapper.mapStateToModel(submitState);
-    final resultMessage = await _repository.updateQuestionnaire(model: submitModel);
+    final response = await _repository.updateQuestionnaire(model: submitModel);
 
-    final newState = state.copyWith(
-      isLoading: false,
-      message: resultMessage,
-      likeQuestionAnswer: likeQuestionAnswer,
-      homeAssignmentOther: homeAssignmentOther,
-    );
-    emit(newState);
+    final newState = response.success
+        ? QuestionnaireState.initial()
+        : state.copyWith(
+            isLoading: false,
+            likeQuestionAnswer: likeQuestionAnswer,
+            homeAssignmentOther: homeAssignmentOther,
+          );
+    emit(newState.copyWith(message: response.message));
   }
 }
 

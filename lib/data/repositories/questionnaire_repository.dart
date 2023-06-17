@@ -1,5 +1,6 @@
 import 'package:questionnaire/bl/mappers/questionnaire_mapper.dart';
 import 'package:questionnaire/data/models/questionnaire_model.dart';
+import 'package:questionnaire/data/models/update_response.dart';
 import 'package:questionnaire/data/providers/api_manager.dart';
 
 class QuestionnaireRepository {
@@ -8,13 +9,9 @@ class QuestionnaireRepository {
 
   const QuestionnaireRepository(this._apiManager, this._mapper);
 
-  Future<String> updateQuestionnaire({required QuestionnaireModel model}) async {
+  Future<UpdateResponse> updateQuestionnaire({required QuestionnaireModel model}) async {
     final jsonMap = _mapper.mapModelToJson(model);
     final apiResponse = await _apiManager.updateQuestionnaire(jsonMap);
-    if (apiResponse.success) {
-      return "Success";
-    } else {
-      return apiResponse.data["error"].toString();
-    }
+    return _mapper.mapApiToUpdateResponse(apiResponse);
   }
 }

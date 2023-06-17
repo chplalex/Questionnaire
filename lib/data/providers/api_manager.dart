@@ -10,6 +10,8 @@ import '../../app/app_typedefs.dart';
 import '../models/api_response.dart';
 
 class ApiManager {
+  static const errorKey = "error";
+
   static const _headers = {
     "Accept": "*/*",
     "Content-Type": "application/json",
@@ -47,7 +49,7 @@ class ApiManager {
       final success = response.statusCode == 200 || response.statusCode == 201;
       return ApiResponse(success: success, data: responseMap);
     } on Exception catch (error) {
-      return ApiResponse(success: false, data: {"error": error});
+      return ApiResponse(success: false, data: {errorKey: error.toString()});
     }
   }
 }

@@ -35,5 +35,7 @@ class AppConstants {
 
   static const connectionTimeoutDuration = Duration(seconds: 2);
 
-  static String cardTitleAsterisk = " *";
+  static const cardTitleAsterisk = " *";
+
+  static const successMessage = "Success";
 }
