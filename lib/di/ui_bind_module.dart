@@ -3,7 +3,7 @@ import 'package:questionnaire/ui/questionnaire_widget.dart';
 
 import '../ui/app.dart';
 
-class WidgetsBindModule {
+class UiBindModule {
   static provide() {
     GetIt.I.registerFactory(() => const App());
     GetIt.I.registerFactory(() => const QuestionnaireWidget());

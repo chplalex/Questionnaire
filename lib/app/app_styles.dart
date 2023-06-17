@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'app_colors.dart';
+
 class AppStyles {
   static const title28 = TextStyle(
     fontFamily: 'Poppins',
@@ -38,6 +40,14 @@ class AppStyles {
     color: Colors.red,
     fontSize: 14.0,
     fontWeight: FontWeight.w500,
+    letterSpacing: 0,
+  );
+
+  static const toast = TextStyle(
+    fontFamily: 'Poppins',
+    color: AppColors.lightBlack,
+    fontSize: 14.0,
+    fontWeight: FontWeight.w300,
     letterSpacing: 0,
   );
 }

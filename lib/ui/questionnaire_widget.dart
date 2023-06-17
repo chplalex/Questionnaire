@@ -3,9 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:questionnaire/app/app_constants.dart';
 import 'package:questionnaire/app/app_enums.dart';
 import 'package:questionnaire/app/app_styles.dart';
-import 'package:questionnaire/bl/questionnaire_cubit.dart';
-import 'package:questionnaire/bl/questionnaire_state.dart';
+import 'package:questionnaire/bl/blocs/questionnaire_cubit.dart';
+import 'package:questionnaire/data/states/questionnaire_state.dart';
 import 'package:questionnaire/ui/questionnaire_text_field.dart';
+import 'package:questionnaire/ui/questionnaire_toast.dart';
 
 import '../app/app_colors.dart';
 
@@ -22,6 +23,8 @@ class _QuestionnaireState extends State<QuestionnaireWidget> {
   static const _smallPadding = 4.0;
   static const _topLineHeight = 10.0;
   static const _cardRadius = 6.0;
+  static const _progressIndicatorSize = 50.0;
+  static const _loadingWidgetOpacity = 0.5;
 
   late final QuestionnaireCubit _cubit;
 
@@ -63,11 +66,35 @@ class _QuestionnaireState extends State<QuestionnaireWidget> {
       );
 
   Widget _body(BuildContext context) {
+    return BlocConsumer<QuestionnaireCubit, QuestionnaireState>(
+      listener: (context, state) => _showToast(context, state.message!),
+      listenWhen: (_, state) => state.message != null,
+      builder: (context, state) {
+        return Stack(
+          alignment: Alignment.center,
+          children: [
+            _mainWidget(context, state),
+            if (state.isLoading) ..._loadingWidget(),
+          ],
+        );
+      },
+    );
+  }
+
+  List<Widget> _loadingWidget() => [
+    Container(color: Colors.black.withOpacity(_loadingWidgetOpacity)),
+    const SizedBox(
+      width: _progressIndicatorSize,
+      height: _progressIndicatorSize,
+      child: CircularProgressIndicator(),
+    ),
+  ];
+
+  Widget _mainWidget(BuildContext context, QuestionnaireState state) {
     const divider = SizedBox(height: _normalPadding);
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(_largePadding),
-      child: BlocBuilder<QuestionnaireCubit, QuestionnaireState>(builder: (context, state) {
-        return Column(
+        padding: const EdgeInsets.all(_largePadding),
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _titleCard(),
@@ -78,11 +105,20 @@ class _QuestionnaireState extends State<QuestionnaireWidget> {
             divider,
             _homeAssignmentCard(context, state),
             divider,
-            _button(),
+            _button(context, state),
           ],
-        );
-      }),
-    );
+        ),
+      );
+  }
+
+  void _showToast(BuildContext context, String message) {
+      final snackBar = SnackBar(
+        content: QuestionnaireToast(text: message),
+        duration: const Duration(seconds: AppConstants.toastDurationInSeconds),
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   Widget _titleCard() => Container(
@@ -245,7 +281,17 @@ class _QuestionnaireState extends State<QuestionnaireWidget> {
         },
       );
 
-  Widget _button() => ElevatedButton(child: const Text(AppConstants.submitButtonText), onPressed: () => {});
+  Widget _button(BuildContext context, QuestionnaireState state) => ElevatedButton(
+        child: const Text(AppConstants.submitButtonText),
+        onPressed: () {
+          if (state.isButtonEnabled) {
+            _cubit.submitQuestionnaire();
+            FocusScope.of(context).unfocus();
+          } else {
+            _showToast(context, AppConstants.buttonIsDisabledToast);
+          }
+        },
+      );
 
   Widget _questionCard({required Widget child}) => Container(
         width: double.infinity,

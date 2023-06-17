@@ -21,4 +21,16 @@ class AppConstants {
   static const homeAssignmentCardOther = "Other";
 
   static const submitButtonText = "Submit";
+
+  static const maxRequestAttempts = 3;
+  static const delayFactor = 1000;
+  static const durationMilliseconds = 10000;
+  static const appKey = 'uec3yFm56gYLdpCAQfUbaPVnwlv8qtJB';
+
+  static const questionnaireAuthority = "localhost:3000";
+  static const updateQuestionnaireEndPoint = "questionnaire";
+
+  static const toastDurationInSeconds = 2;
+
+  static const buttonIsDisabledToast = "Please, fill all required fields";
 }

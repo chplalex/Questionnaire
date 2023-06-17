@@ -1,9 +1,9 @@
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
 
+import 'di/bl_bind_module.dart';
+import 'di/ui_bind_module.dart';
 import 'ui/app.dart';
-import 'di/blocs_bind_module.dart';
-import 'di/widgets_bind_module.dart';
 
 void main() {
   setupDI();
@@ -12,6 +12,6 @@ void main() {
 }
 
 void setupDI() {
-  BlocsBindModule.provide();
-  WidgetsBindModule.provide();
+  BlBindModule.provide();
+  UiBindModule.provide();
 }
