@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:questionnaire/app/app_constants.dart';
 import 'package:questionnaire/app/app_enums.dart';
 import 'package:questionnaire/app/app_styles.dart';
@@ -9,6 +10,7 @@ import 'package:questionnaire/ui/questionnaire_text_field.dart';
 import 'package:questionnaire/ui/questionnaire_toast.dart';
 
 import '../app/app_colors.dart';
+import 'network_settings_dialog.dart';
 
 class QuestionnaireWidget extends StatefulWidget {
   const QuestionnaireWidget({super.key});
@@ -28,8 +30,10 @@ class _QuestionnaireState extends State<QuestionnaireWidget> {
 
   late final QuestionnaireCubit _cubit;
 
-  final _likeQuestionController = TextEditingController();
+  final _authorityController = TextEditingController();
   final _homeAssignmentController = TextEditingController();
+  final _likeQuestionController = TextEditingController();
+  final _portController = TextEditingController();
 
   final _likeQuestionFocusNode = FocusNode();
   final _homeAssignmentFocusNode = FocusNode();
@@ -46,6 +50,14 @@ class _QuestionnaireState extends State<QuestionnaireWidget> {
     _homeAssignmentController.addListener(() {
       _cubit.homeAssignmentOther = _homeAssignmentController.text;
     });
+
+    _authorityController.addListener(() {
+      _cubit.authority = _authorityController.text;
+    });
+
+    _portController.addListener(() {
+      _cubit.port = _portController.text;
+    });
   }
 
   @override
@@ -55,6 +67,9 @@ class _QuestionnaireState extends State<QuestionnaireWidget> {
 
     _likeQuestionFocusNode.dispose();
     _homeAssignmentFocusNode.dispose();
+
+    _authorityController.dispose();
+    _portController.dispose();
 
     super.dispose();
   }
@@ -82,43 +97,43 @@ class _QuestionnaireState extends State<QuestionnaireWidget> {
   }
 
   List<Widget> _loadingWidget() => [
-    Container(color: Colors.black.withOpacity(_loadingWidgetOpacity)),
-    const SizedBox(
-      width: _progressIndicatorSize,
-      height: _progressIndicatorSize,
-      child: CircularProgressIndicator(),
-    ),
-  ];
+        Container(color: Colors.black.withOpacity(_loadingWidgetOpacity)),
+        const SizedBox(
+          width: _progressIndicatorSize,
+          height: _progressIndicatorSize,
+          child: CircularProgressIndicator(),
+        ),
+      ];
 
   Widget _mainWidget(BuildContext context, QuestionnaireState state) {
     const divider = SizedBox(height: _normalPadding);
     return SingleChildScrollView(
-        padding: const EdgeInsets.all(_largePadding),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _titleCard(),
-            divider,
-            _languageCard(context, state),
-            divider,
-            _likeQuestionCard(state),
-            divider,
-            _homeAssignmentCard(context, state),
-            divider,
-            _button(context, state),
-          ],
-        ),
-      );
+      padding: const EdgeInsets.all(_largePadding),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _titleCard(),
+          divider,
+          _languageCard(context, state),
+          divider,
+          _likeQuestionCard(state),
+          divider,
+          _homeAssignmentCard(context, state),
+          divider,
+          _actionRow(context, state),
+        ],
+      ),
+    );
   }
 
   void _showToast(BuildContext context, String message) {
-      final snackBar = SnackBar(
-        content: QuestionnaireToast(text: message),
-        duration: const Duration(seconds: AppConstants.toastDurationInSeconds),
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-      );
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    final snackBar = SnackBar(
+      content: QuestionnaireToast(text: message),
+      duration: const Duration(seconds: AppConstants.toastDurationInSeconds),
+      elevation: 0,
+      backgroundColor: Colors.transparent,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   Widget _titleCard() => Container(
@@ -188,11 +203,11 @@ class _QuestionnaireState extends State<QuestionnaireWidget> {
       );
 
   Widget _cardTitle({required String text, required bool isRequired}) => Row(
-    children: [
-      Text(text, style: AppStyles.title16),
-      if (isRequired) Text(AppConstants.cardTitleAsterisk, style: AppStyles.title16Red),
-    ],
-  );
+        children: [
+          Text(text, style: AppStyles.title16),
+          if (isRequired) const Text(AppConstants.cardTitleAsterisk, style: AppStyles.title16Red),
+        ],
+      );
 
   Widget _languageTypeRadio(
     BuildContext context, {
@@ -288,11 +303,11 @@ class _QuestionnaireState extends State<QuestionnaireWidget> {
         },
       );
 
-  Widget _button(BuildContext context, QuestionnaireState state) => ElevatedButton(
+  Widget _submitButton(BuildContext context, QuestionnaireState state) => ElevatedButton(
         child: const Text(AppConstants.submitButtonText),
         onPressed: () {
           if (state.isButtonEnabled) {
-            _cubit.submitQuestionnaire();
+            _cubit.submitButtonPressed();
             FocusScope.of(context).unfocus();
           } else {
             _showToast(context, AppConstants.buttonIsDisabledToast);
@@ -309,5 +324,25 @@ class _QuestionnaireState extends State<QuestionnaireWidget> {
         ),
         padding: const EdgeInsets.all(_largePadding),
         child: child,
+      );
+
+  Widget _actionRow(BuildContext context, QuestionnaireState state) => Row(
+        children: [
+          _submitButton(context, state),
+          const Spacer(),
+          _settingsButton(context, state),
+        ],
+      );
+
+  Widget _settingsButton(BuildContext context, QuestionnaireState state) => IconButton(
+        // onPressed: () => _cubit.settingsButtonPressed(),
+        onPressed: () => NetworkSettingsDialog(
+          authorityController: _authorityController,
+          portController: _portController,
+          authorityValidator: _cubit.authorityValidator,
+          portValidator: _cubit.portValidator,
+          onApply: _cubit.onNetworkSettingsApply,
+        )..show(context),
+        icon: SvgPicture.asset(AppConstants.iconSettings),
       );
 }

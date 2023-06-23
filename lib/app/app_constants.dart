@@ -25,8 +25,9 @@ class AppConstants {
   static const apiMaxRequestAttempts = 3;
   static const apiRetryDelayFactorDuration = Duration(milliseconds: 1000);
 
-  // for testing on the iOS Simulator only
-  static const questionnaireAuthority = "localhost:3000";
+  static var questionnaireAuthority = "localhost";
+  static var questionnairePort = "3000";
+
   static const updateQuestionnaireEndPoint = "posts";
 
   static const toastDurationInSeconds = 2;
@@ -38,4 +39,18 @@ class AppConstants {
   static const cardTitleAsterisk = " *";
 
   static const successMessage = "Success";
+
+  static const iconSettings = "assets/ic_settings.svg";
+
+  static const networkSettingsDialogTitle = "Network Settings";
+  static const networkSettingsDialogLabelAuthority = "Host authority";
+  static const networkSettingsDialogLabelPort = "Port";
+
+  static const buttonLabelApply = "Apply";
+  static const buttonLabelCancel = "Cancel";
+
+  static const authorityIsEmptyError = "can't be empty";
+
+  static const portNotIntegerError = "should be empty or integer";
+  static const portRangeError = "integer can be from 1025 to 65536";
 }

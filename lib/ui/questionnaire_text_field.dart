@@ -6,7 +6,8 @@ class QuestionnaireTextField extends StatelessWidget {
   final String originalText;
   final String? hintText;
   final bool isEnable;
-  final FocusNode focusNode;
+  final FocusNode? focusNode;
+  final FormFieldValidator<String>? validator;
 
   const QuestionnaireTextField({
     super.key,
@@ -15,13 +16,14 @@ class QuestionnaireTextField extends StatelessWidget {
     this.hintText,
     required this.isEnable,
     required this.focusNode,
+    this.validator,
   });
 
   @override
   Widget build(BuildContext context) {
     controller.text = originalText;
     controller.selection = TextSelection.collapsed(offset: originalText.length);
-    return TextField(
+    return TextFormField(
       keyboardType: TextInputType.multiline,
       maxLines: null,
       readOnly: !isEnable,
@@ -29,6 +31,8 @@ class QuestionnaireTextField extends StatelessWidget {
       style: isEnable ? AppStyles.text14Black : AppStyles.text14BlackNotEnabled,
       decoration: InputDecoration(hintText: hintText, contentPadding: EdgeInsets.zero),
       focusNode: focusNode,
+      validator: validator,
+      autovalidateMode: validator == null ? null : AutovalidateMode.onUserInteraction,
     );
   }
 }

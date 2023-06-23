@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 import 'package:questionnaire/app/app_constants.dart';
 import 'package:retry/retry.dart';
@@ -27,7 +28,12 @@ class ApiManager {
   const ApiManager(this._client);
 
   Future<ApiResponse> updateQuestionnaire(JsonMap jsonMap) async {
-    final uri = Uri.http(AppConstants.questionnaireAuthority, AppConstants.updateQuestionnaireEndPoint);
+    final authority = AppConstants.questionnairePort.isEmpty
+        ? AppConstants.questionnaireAuthority
+        : "${AppConstants.questionnaireAuthority}:${AppConstants.questionnairePort}";
+    final uri = Uri.http(authority, AppConstants.updateQuestionnaireEndPoint);
+
+    debugPrint("Make API call: $uri");
 
     try {
       final body = json.encode(jsonMap);
