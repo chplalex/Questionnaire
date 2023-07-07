@@ -12,6 +12,8 @@ import '../models/api_response.dart';
 
 class ApiManager {
   static const errorKey = "error";
+  static const questionsKey = "questions";
+  static const answersKey = "answers";
 
   static const _headers = {
     "Accept": "*/*",
@@ -27,11 +29,37 @@ class ApiManager {
 
   const ApiManager(this._client);
 
-  Future<ApiResponse> updateQuestionnaire(JsonMap jsonMap) async {
-    final authority = AppConstants.questionnairePort.isEmpty
-        ? AppConstants.questionnaireAuthority
-        : "${AppConstants.questionnaireAuthority}:${AppConstants.questionnairePort}";
-    final uri = Uri.http(authority, AppConstants.updateQuestionnaireEndPoint);
+  Future<ApiResponse> getQuestions() async {
+    final authority = _authority();
+    final uri = Uri.http(authority, AppConstants.questionsEndPoint);
+
+    debugPrint("Make API call: $uri");
+
+    try {
+      final response = await _retryOptions.retry(
+        () => _client
+            .get(
+              uri,
+              headers: _headers,
+            )
+            .timeout(
+              AppConstants.connectionTimeoutDuration,
+            ),
+        retryIf: (error) {
+          return error is SocketException || error is TimeoutException;
+        },
+      );
+      final responseMap = json.decode(response.body);
+      final success = response.statusCode == 200;
+      return ApiResponse(success: success, data: {questionsKey: responseMap});
+    } on Exception catch (error) {
+      return ApiResponse(success: false, data: {errorKey: error.toString()});
+    }
+  }
+
+  Future<ApiResponse> postAnswers(JsonMap jsonMap) async {
+    final authority = _authority();
+    final uri = Uri.http(authority, AppConstants.answersEndPoint);
 
     debugPrint("Make API call: $uri");
 
@@ -53,9 +81,15 @@ class ApiManager {
       );
       final responseMap = json.decode(response.body);
       final success = response.statusCode == 200 || response.statusCode == 201;
-      return ApiResponse(success: success, data: responseMap);
+      return ApiResponse(success: success, data: {questionsKey: responseMap});
     } on Exception catch (error) {
       return ApiResponse(success: false, data: {errorKey: error.toString()});
     }
+  }
+
+  String _authority() {
+    return AppConstants.questionnairePort.isEmpty
+        ? AppConstants.questionnaireAuthority
+        : "${AppConstants.questionnaireAuthority}:${AppConstants.questionnairePort}";
   }
 }

@@ -11,7 +11,7 @@ class AppConstants {
   static const languageCardCpp = "C++";
 
   static const likeQuestionCardTitle = "What do you like about programming?";
-  static const likeQuestionCardHint = "Your answer";
+  static const openQuestionHint = "Your answer";
 
   static const homeAssignmentCardTitle = "How was the assignment?";
 
@@ -25,10 +25,12 @@ class AppConstants {
   static const apiMaxRequestAttempts = 3;
   static const apiRetryDelayFactorDuration = Duration(milliseconds: 1000);
 
-  static var questionnaireAuthority = "localhost";
+  // TODO: return to localhost
+  static var questionnaireAuthority = "10.0.0.9";
   static var questionnairePort = "3000";
 
-  static const updateQuestionnaireEndPoint = "posts";
+  static const questionsEndPoint = "questions";
+  static const answersEndPoint = "answers";
 
   static const toastDurationInSeconds = 2;
 

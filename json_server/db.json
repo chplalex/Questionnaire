@@ -1,9 +1,62 @@
 {
-  "posts": [
-    { "id": 1, "title": "json-server", "author": "typicode" }
+  "questions": [
+    {
+      "id": 1,
+      "text": "What language is your favorite?",
+      "type": "close",
+      "required": true,
+      "options": [
+        {
+          "id": 1,
+          "text": "Kotlin",
+          "type": "close"
+        },
+        {
+          "id": 2,
+          "text": "Java",
+          "type": "close"
+        },
+        {
+          "id": 3,
+          "text": "C++",
+          "type": "close"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "text": "What do you like about programming?",
+      "type": "open",
+      "required": false
+    },
+    {
+      "id": 3,
+      "text": "How was the assignment?",
+      "type": "close",
+      "required": true,
+      "options": [
+        {
+          "id": 1,
+          "text": "Easy",
+          "type": "close"
+        },
+        {
+          "id": 2,
+          "text": "Normal",
+          "type": "close"
+        },
+        {
+          "id": 3,
+          "text": "Hard",
+          "type": "close"
+        },
+        {
+          "id": 4,
+          "text": "Other",
+          "type": "open"
+        }
+      ]
+    }
   ],
-  "comments": [
-    { "id": 1, "body": "some comment", "postId": 1 }
-  ],
-  "profile": { "name": "typicode" }
+  "answers": []
 }

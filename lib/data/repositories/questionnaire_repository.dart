@@ -1,17 +1,27 @@
-import 'package:questionnaire/bl/mappers/questionnaire_mapper.dart';
-import 'package:questionnaire/data/models/questionnaire_model.dart';
-import 'package:questionnaire/data/models/update_response.dart';
+import 'package:questionnaire/data/models/post_answers_response.dart';
+import 'package:questionnaire/data/models/question_model.dart';
 import 'package:questionnaire/data/providers/api_manager.dart';
+
+import '../../bl/mappers/answer_mapper.dart';
+import '../../bl/mappers/question_mapper.dart';
+import '../models/answer_model.dart';
 
 class QuestionnaireRepository {
   final ApiManager _apiManager;
-  final QuestionnaireMapper _mapper;
+  final QuestionMapper _questionMapper;
+  final AnswerMapper _answerMapper;
 
-  const QuestionnaireRepository(this._apiManager, this._mapper);
+  const QuestionnaireRepository(this._apiManager, this._questionMapper, this._answerMapper);
 
-  Future<UpdateResponse> updateQuestionnaire({required QuestionnaireModel model}) async {
-    final jsonMap = _mapper.mapModelToJson(model);
-    final apiResponse = await _apiManager.updateQuestionnaire(jsonMap);
-    return _mapper.mapApiToUpdateResponse(apiResponse);
+  Future<List<QuestionModel>> getQuestions() => _apiManager.getQuestions().then((apiResponse) {
+    return apiResponse.success
+      ? _questionMapper.mapJsonListToQuestions(apiResponse.data[ApiManager.questionsKey])
+      : throw Exception(apiResponse.data[ApiManager.errorKey]);
+  });
+
+  Future<PostAnswersResponse> postAnswers({required List<AnswerModel> answers}) async {
+    final jsonList = _answerMapper.mapAnswersToJsonList(answers);
+    final apiResponse = await _apiManager.postAnswers({ApiManager.answersKey: jsonList});
+    return _answerMapper.mapApiToPostAnswersResponse(apiResponse);
   }
 }

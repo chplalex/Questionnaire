@@ -1,12 +1,10 @@
-enum LanguageType {
-  kotlin,
-  java,
-  cpp,
+enum QuestionType {
+  open,
+  close
 }
 
-enum DifficultType {
-  easy,
-  normal,
-  hard,
-  other,
+enum OptionType {
+  open,
+  close
 }
+

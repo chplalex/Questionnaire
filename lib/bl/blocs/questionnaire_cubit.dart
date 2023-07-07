@@ -1,80 +1,52 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:questionnaire/app/app_constants.dart';
-import 'package:questionnaire/bl/mappers/questionnaire_mapper.dart';
+import 'package:questionnaire/bl/mappers/question_mapper.dart';
 import 'package:questionnaire/data/repositories/questionnaire_repository.dart';
 
-import '../../app/app_enums.dart';
 import '../../data/states/questionnaire_state.dart';
+import '../mappers/answer_mapper.dart';
 
 class QuestionnaireCubit extends Cubit<QuestionnaireState> {
   static const _portValueMin = 1025;
   static const _portValueMax = 65536;
 
-  final QuestionnaireMapper _mapper;
+  final QuestionMapper _questionMapper;
+  final AnswerMapper _answerMapper;
   final QuestionnaireRepository _repository;
 
-  var likeQuestionAnswer = "";
-  var homeAssignmentOther = "";
   var authority = "";
   var port = "";
 
-  QuestionnaireCubit(this._mapper, this._repository) : super(QuestionnaireState.initial());
+  QuestionnaireCubit(this._questionMapper, this._answerMapper, this._repository) : super(QuestionnaireState.initial());
 
-  void languageChanged(LanguageType? languageType) {
-    final newState = state
-        .copyWith(
-          languageType: languageType,
-          likeQuestionAnswer: likeQuestionAnswer,
-          homeAssignmentOther: homeAssignmentOther,
-        )
-        .check;
-
-    emit(newState);
-  }
-
-  void difficultyChanged(DifficultType? difficultType) {
-    final newState = state
-        .copyWith(
-          homeAssignmentDifficultType: difficultType,
-          likeQuestionAnswer: likeQuestionAnswer,
-          homeAssignmentOther: homeAssignmentOther,
-          homeAssignmentOtherIsEnable: difficultType == DifficultType.other,
-        )
-        .check;
-
-    emit(newState);
+  void init() async {
+    try {
+      final questionModels = await _repository.getQuestions();
+      final questionStates = questionModels
+          .map(
+            (model) => _questionMapper.mapModelToState(model),
+          )
+          .toList(growable: false);
+      final newState = QuestionnaireState(isLoading: false, isButtonEnabled: false, questions: questionStates);
+      emit(newState);
+    } on Exception catch (error) {
+      final newState = state.copyWith(isLoading: false, message: error.toString());
+      emit(newState);
+    }
   }
 
   void submitButtonPressed() async {
-    final loadingState = state.copyWith(
-      isLoading: true,
-      likeQuestionAnswer: likeQuestionAnswer,
-      homeAssignmentOther: homeAssignmentOther,
-    );
-    emit(loadingState);
+    emit(state.copyWith(isLoading: true));
 
-    final submitState = state.copyWith(
-      likeQuestionAnswer: likeQuestionAnswer,
-      homeAssignmentOther: state.homeAssignmentDifficultType == DifficultType.other ? homeAssignmentOther : "",
-    );
-    final submitModel = _mapper.mapStateToModel(submitState);
-    final response = await _repository.updateQuestionnaire(model: submitModel);
+    final answers = state.questions
+        .map(
+          (questionState) => _answerMapper.mapStateToModel(questionState),
+        )
+        .toList(growable: false);
 
-    final newState = response.success
-        ? QuestionnaireState.initial()
-        : state.copyWith(
-            isLoading: false,
-            likeQuestionAnswer: likeQuestionAnswer,
-            homeAssignmentOther: homeAssignmentOther,
-          );
-    emit(newState.copyWith(message: response.message));
-  }
+    final response = await _repository.postAnswers(answers: answers);
 
-  void settingsButtonPressed() {
-    final newState = state.copyWith(
-      likeQuestionAnswer: likeQuestionAnswer,
-      homeAssignmentOther: homeAssignmentOther,
-    );
+    final newState = state.copyWith(isLoading: false, message: response.message);
     emit(newState);
   }
 
@@ -102,7 +74,6 @@ class QuestionnaireCubit extends Cubit<QuestionnaireState> {
 
 extension _QuestionnaireStateExtension on QuestionnaireState {
   QuestionnaireState get check {
-    final isCompleted = languageType != null && homeAssignmentDifficultType != null;
-    return copyWith(isButtonEnabled: isCompleted, message: message);
+    return copyWith(isButtonEnabled: false, message: message);
   }
 }
